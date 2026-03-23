@@ -1,0 +1,22 @@
+# render.yaml — Render Blueprint (Infrastructure as Code)
+# https://docs.render.com/blueprint-spec
+
+services:
+  - type: web
+    name: trusthut-backend
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn trusthut_backend.wsgi:application --bind 0.0.0.0:$PORT"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com"
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false  # set manually to your frontend URL
+      - key: FIREBASE_CREDENTIAL_PATH
+        value: "/etc/secrets/serviceAccountKey.json"
+      - key: PYTHON_VERSION
+        value: "3.11.11"
