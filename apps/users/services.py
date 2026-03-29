@@ -31,3 +31,14 @@ def update_user(uid, data):
     db.collection(USERS_COLLECTION).document(uid).update(data)
     updated_doc = db.collection(USERS_COLLECTION).document(uid).get()
     return updated_doc.to_dict()
+
+
+def get_all_users():
+    """Get all user documents from Firestore."""
+    db = get_firestore_client()
+    docs = db.collection(USERS_COLLECTION).stream()
+    users = []
+    for doc in docs:
+        users.append(doc.to_dict())
+    users.sort(key=lambda u: u.get('created_at', ''), reverse=True)
+    return users

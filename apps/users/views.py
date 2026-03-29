@@ -67,3 +67,11 @@ def profile(request):
 
     updated = services.update_user(uid, update_data)
     return Response({'status': 'success', 'data': updated})
+
+
+@api_view(['GET'])
+@firebase_auth_required
+def list_all_users(request):
+    """List all registered users (admin)."""
+    users = services.get_all_users()
+    return Response({'status': 'success', 'data': users})
