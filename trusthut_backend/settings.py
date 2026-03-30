@@ -12,9 +12,12 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-fallback-key')
 
 DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 'yes')
 
-# Hosts — set ALLOWED_HOSTS in Render env, e.g. "trusthut-backend.onrender.com,yourdomain.com"
+# Always allow Vercel + Render domains; extend via ALLOWED_HOSTS env var
+_default_hosts = '.vercel.app,.onrender.com,localhost,127.0.0.1'
 ALLOWED_HOSTS = [
-    h.strip() for h in os.getenv('ALLOWED_HOSTS', '*').split(',') if h.strip()
+    h.strip()
+    for h in os.getenv('ALLOWED_HOSTS', _default_hosts).split(',')
+    if h.strip()
 ]
 
 # Application definition
@@ -106,21 +109,22 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'apps.core.exceptions.custom_exception_handler',
 }
 
-# CORS
+# CORS — allow all origins when env var not set (dev + Vercel deployment)
 CORS_ALLOWED_ORIGINS = [
     o.strip() for o in os.getenv('CORS_ALLOWED_ORIGINS', '').split(',') if o.strip()
 ]
-CORS_ALLOW_ALL_ORIGINS = not CORS_ALLOWED_ORIGINS  # True in dev, False when origins set
+CORS_ALLOW_ALL_ORIGINS = not bool(CORS_ALLOWED_ORIGINS)  # True in dev, False when origins set
 CORS_ALLOW_CREDENTIALS = True
 
 # Firebase
 FIREBASE_CREDENTIAL_PATH = os.getenv('FIREBASE_CREDENTIAL_PATH', 'serviceAccountKey.json')
 GOOGLE_MAPS_KEY = os.getenv('GOOGLE_MAPS_KEY', '')
 
-# Production security
+# Production security — disable SSL redirect on Vercel (handled at edge)
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', 'True').lower() in ('true', '1')
+    # Vercel/Render terminate SSL at the proxy level — redirecting causes 500s
+    SECURE_SSL_REDIRECT = False
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
