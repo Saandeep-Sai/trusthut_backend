@@ -21,6 +21,7 @@ staticfiles/
 # Firebase / Keys
 *firebase-adminsdk*.json
 *serviceAccountKey*.json
+firebase_b64.txt
 
 # OS specific files
 .DS_Store
