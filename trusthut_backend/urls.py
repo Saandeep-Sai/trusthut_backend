@@ -19,5 +19,7 @@ urlpatterns = [
     path('api/posts/', include('apps.posts.urls')),
     path('api/', include('apps.likes.urls')),
     path('api/chatbot/', include('apps.chatbot.urls')),
+    path('api/routes/', include('apps.routes.urls')),
+    path('api/comments/', include('apps.comments.urls')),
 ]
 

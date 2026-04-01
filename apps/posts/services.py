@@ -28,6 +28,10 @@ def create_post(user_id, validated_data):
         'risk_level': validated_data['risk_level'],
         'media_url': validated_data.get('media_url', ''),
         'media_type': validated_data.get('media_type', 'image'),
+        # Highway safety fields (backward-compatible defaults)
+        'post_type': validated_data.get('post_type', 'place'),
+        'risk_category': validated_data.get('risk_category', ''),
+        'route_name': validated_data.get('route_name', ''),
         'likes_count': 0,
         'created_at': now,
         'updated_at': now,
@@ -88,11 +92,29 @@ def search_posts(query):
 def get_user_posts(user_id):
     """Get all posts by a specific user."""
     db = get_firestore_client()
-    # Note: using where + order_by requires a composite index in Firestore.
-    # We query without order_by and sort in Python to avoid that requirement.
     docs = db.collection(POSTS_COLLECTION).where(
         'user_id', '==', user_id
     ).stream()
     posts = [doc.to_dict() for doc in docs]
     posts.sort(key=lambda p: p.get('created_at', ''), reverse=True)
     return posts
+
+
+def get_highway_risks(risk_category=None, severity=None):
+    """Get all highway risk posts, optionally filtered."""
+    db = get_firestore_client()
+    query = db.collection(POSTS_COLLECTION).where('post_type', '==', 'highway')
+    docs = query.stream()
+
+    results = []
+    for doc in docs:
+        data = doc.to_dict()
+        # Apply optional filters in Python (avoids composite index requirement)
+        if risk_category and data.get('risk_category') != risk_category:
+            continue
+        if severity and data.get('risk_level') != severity:
+            continue
+        results.append(data)
+
+    results.sort(key=lambda p: p.get('created_at', ''), reverse=True)
+    return results

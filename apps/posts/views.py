@@ -112,3 +112,12 @@ def user_posts(request):
     """Get posts by the authenticated user."""
     posts = services.get_user_posts(request.firebase_uid)
     return Response({'status': 'success', 'data': posts})
+
+
+@api_view(['GET'])
+def highway_risks(request):
+    """Get all highway risk posts (public)."""
+    risk_category = request.GET.get('risk_category', None)
+    severity = request.GET.get('severity', None)
+    posts = services.get_highway_risks(risk_category=risk_category, severity=severity)
+    return Response({'status': 'success', 'data': posts})

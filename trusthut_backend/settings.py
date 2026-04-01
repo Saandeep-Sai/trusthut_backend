@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'apps.posts',
     'apps.likes',
     'apps.chatbot',
+    'apps.routes',
+    'apps.comments',
 ]
 
 MIDDLEWARE = [

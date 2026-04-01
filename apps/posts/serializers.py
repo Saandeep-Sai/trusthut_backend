@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps.core.config import ACCESSIBILITY_TYPES, RISK_LEVELS
+from apps.core.config import ACCESSIBILITY_TYPES, RISK_LEVELS, POST_TYPES, RISK_CATEGORIES
 
 
 class PostCreateSerializer(serializers.Serializer):
@@ -16,6 +16,10 @@ class PostCreateSerializer(serializers.Serializer):
         choices=[('image', 'Image'), ('video', 'Video')],
         required=False, default='image'
     )
+    # Highway safety fields (optional — backward compatible)
+    post_type = serializers.ChoiceField(choices=['place', 'highway'], required=False, default='place')
+    risk_category = serializers.ChoiceField(choices=RISK_CATEGORIES, required=False, allow_blank=True)
+    route_name = serializers.CharField(max_length=300, required=False, allow_blank=True)
 
 
 class PostUpdateSerializer(serializers.Serializer):
@@ -32,3 +36,6 @@ class PostUpdateSerializer(serializers.Serializer):
         choices=[('image', 'Image'), ('video', 'Video')],
         required=False
     )
+    post_type = serializers.ChoiceField(choices=POST_TYPES, required=False)
+    risk_category = serializers.ChoiceField(choices=RISK_CATEGORIES, required=False, allow_blank=True)
+    route_name = serializers.CharField(max_length=300, required=False, allow_blank=True)
