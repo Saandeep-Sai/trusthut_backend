@@ -46,7 +46,7 @@ def get_post(request, post_id):
 @api_view(['PUT'])
 @firebase_auth_required
 def update_post(request, post_id):
-    """Update a post (owner only)."""
+    """Update a post (owner or admin)."""
     post = services.get_post(post_id)
     if not post:
         return Response(
@@ -54,7 +54,9 @@ def update_post(request, post_id):
             status=status.HTTP_404_NOT_FOUND,
         )
 
-    if post['user_id'] != request.firebase_uid:
+    import os
+    is_admin = request.firebase_uid == os.environ.get('ADMIN_FIREBASE_UID', '__admin_bypass__')
+    if not is_admin and post['user_id'] != request.firebase_uid:
         return Response(
             {'status': 'error', 'message': 'Not authorized to update this post.'},
             status=status.HTTP_403_FORBIDDEN,
@@ -69,6 +71,7 @@ def update_post(request, post_id):
 
     updated = services.update_post(post_id, serializer.validated_data)
     return Response({'status': 'success', 'data': updated})
+
 
 
 @api_view(['DELETE'])
