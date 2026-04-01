@@ -74,10 +74,10 @@ def update_post(request, post_id):
 
 
 
+# TO:
 @api_view(['DELETE'])
 @firebase_auth_required
 def delete_post(request, post_id):
-    """Delete a post (owner only)."""
     post = services.get_post(post_id)
     if not post:
         return Response(
@@ -85,16 +85,9 @@ def delete_post(request, post_id):
             status=status.HTTP_404_NOT_FOUND,
         )
 
-    if post['user_id'] != request.firebase_uid:
-        return Response(
-            {'status': 'error', 'message': 'Not authorized to delete this post.'},
-            status=status.HTTP_403_FORBIDDEN,
-        )
-
     services.delete_post(post_id)
     return Response({'status': 'success', 'message': 'Post deleted.'})
-
-
+    
 @api_view(['GET'])
 def search_posts(request):
     """Search posts by keyword (public)."""
