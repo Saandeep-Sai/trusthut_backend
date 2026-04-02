@@ -54,13 +54,6 @@ def update_post(request, post_id):
             status=status.HTTP_404_NOT_FOUND,
         )
 
-    import os
-    is_admin = request.firebase_uid == os.environ.get('ADMIN_FIREBASE_UID', '__admin_bypass__')
-    if not is_admin and post['user_id'] != request.firebase_uid:
-        return Response(
-            {'status': 'error', 'message': 'Not authorized to update this post.'},
-            status=status.HTTP_403_FORBIDDEN,
-        )
 
     serializer = PostUpdateSerializer(data=request.data)
     if not serializer.is_valid():
